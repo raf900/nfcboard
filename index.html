@@ -31,19 +31,21 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 32px 16px;
+      padding: 88px 16px 32px;
+      position: relative;
       min-height: 100vh;
     }
-    .icon { width: 140px; height: 140px; margin-bottom: 28px; }
-    .wordmark {
-      font-size: clamp(44px, 11vw, 76px);
-      letter-spacing: 0.03em;
-      line-height: 1;
+    .brand {
+      position: absolute; top: 20px; left: 24px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 22px; letter-spacing: 0.03em; line-height: 1;
     }
-    .wordmark b { font-weight: 800; }
-    .wordmark span { font-weight: 300; }
+    .brand img { width: 36px; height: 36px; }
+    .brand b { font-weight: 800; }
+    .brand span { font-weight: 300; }
+    h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
     .tag {
-      margin-top: 22px;
+      margin-top: 36px;
       font-size: clamp(17px, 4.2vw, 20px);
       line-height: 1.5;
       max-width: 32em;
@@ -63,7 +65,7 @@
     }
     .contact { margin-top: 28px; }
     .contact img { display: block; margin: 0 auto; }
-    .exploded { width: 100%; max-width: 560px; height: auto; margin-top: 56px; }
+    .exploded { width: 100%; max-width: 620px; height: auto; }
     footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,12 +73,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <img class="icon" src="assets/nfcboard-icon.svg" alt="">
-  <h1 class="wordmark"><b>NFC</b><span>BOARD</span></h1>
+  <div class="brand"><img src="assets/nfcboard-icon.svg" alt=""><div><b>NFC</b><span>BOARD</span></div></div>
+  <h1>NFCBOARD</h1>
+  <img class="exploded" src="assets/board-exploded.svg" alt="Exploded view of the board in four layers: top panel, frame, chip with card readers, bottom panel">
   <p class="tag">A board for the bridge table that records every bid, every card played and the final score.</p>
   <p class="soon">Coming soon</p>
   <p class="contact"><img src="assets/email.png" alt="Email address" width="142" height="24"></p>
-  <img class="exploded" src="assets/board-exploded.svg" alt="Exploded view of the board in four layers: top panel, frame, chip with card readers, bottom panel">
   <footer>&copy; 2026 NFCBOARD</footer>
 </body>
 </html>
