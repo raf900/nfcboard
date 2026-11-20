@@ -22,7 +22,6 @@
       --muted: #5A6878;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
     body {
       background: var(--cream);
       color: var(--navy);
@@ -64,8 +63,8 @@
     }
     .contact { margin-top: 28px; }
     .contact img { display: block; margin: 0 auto; }
-    footer { position: absolute; bottom: 20px; font-size: 13px; color: var(--muted); }
-    @media (max-height: 560px) { footer { position: static; margin-top: 32px; } }
+    .exploded { width: 100%; max-width: 560px; height: auto; margin-top: 56px; }
+    footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,6 +76,7 @@
   <p class="tag">A board for the bridge table that records every bid, every card played and the final score.</p>
   <p class="soon">Coming soon</p>
   <p class="contact"><img src="assets/email.png" alt="Email address" width="142" height="24"></p>
+  <img class="exploded" src="assets/board-exploded.svg" alt="Exploded view of the board in four layers: top panel, frame, chip with card readers and screens, bottom panel">
   <footer>&copy; 2026 NFCBOARD</footer>
 </body>
 </html>
