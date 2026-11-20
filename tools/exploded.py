@@ -70,20 +70,21 @@ mid = B / 2
 el.append(poly([p(0, 0, 0, L3), p(B, 0, 0, L3), p(B, B, 0, L3), p(0, B, 0, L3)], "none", NAVY, 1.2,
               ' stroke-dasharray="6 6" opacity="0.3"'))
 # wires first (under the parts)
-wire = 'stroke="%s" stroke-width="2" fill="none" stroke-dasharray="1 0"' % GREEN
+wire = 'stroke="%s" stroke-width="3" fill="none" stroke-linecap="round" class="wire"' % GREEN
 readers = [(mid, 70), (B - 70, mid), (mid, B - 70), (70, mid)]
 screens_at = []    # screens left out of the drawing for now (were at the ends of one diagonal)
 for rx, ry in readers + screens_at:
     a, b = p(mid, mid, 0, L3), p(rx, ry, 0, L3)
-    el.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" {wire} opacity="0.55"/>')
+    el.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" {wire}/>')
 # readers: cream pad with red waves
 for rx, ry in readers:
     h = 34
     el.append(poly(rect(rx - h, ry - h, rx + h, ry + h, L3), CREAM, NAVY, 1.5))
     cx, cy = p(rx, ry, 0, L3)
-    for r in (6, 11, 16):
-        el.append(f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="{r * C30 * S * 1.4:.1f}" ry="{r * S30 * S * 1.4:.1f}" '
-                  f'fill="none" stroke="{RED}" stroke-width="1.6"/>')
+    for i_r, r in enumerate((6, 11, 16)):
+        el.append(f'<ellipse class="ring r{i_r + 1}"'
+                  f'  cx="{cx:.1f}" cy="{cy:.1f}" rx="{r * C30 * S * 1.4:.1f}" ry="{r * S30 * S * 1.4:.1f}" '
+                  f'fill="none" stroke="{RED}" stroke-width="1.8"/>')
     el.append(f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="2.6" ry="1.5" fill="{RED}"/>')
 # chip: navy square with cream legs, like the logo
 ch = 56
@@ -171,20 +172,32 @@ vb = f"{minx:.0f} {miny:.0f} {maxx - minx:.0f} {maxy - miny:.0f}"
 # collapsed: layers start stacked close together, then move apart (exploded)
 order = ["bottom", "elec", "frame", "top"]
 lift = {"top": LIFTS[0], "frame": LIFTS[1], "elec": LIFTS[2], "bottom": LIFTS[3]}
-css = ["svg{overflow:visible}",
-       ".layer{animation:1.6s cubic-bezier(.2,.7,.2,1) .4s both}",
-       ".lab{animation:lab .6s ease-out 1.8s both}",
-       "@keyframes lab{from{opacity:0}}",
-       "@media (prefers-reduced-motion:reduce){.layer,.lab{animation:none}}"]
+# How open the board is comes from the CSS variable --open (0 = closed, 1 = fully apart).
+# The page's slider sets it; on load the page opens the board once by itself.
+css = ["#board-svg{overflow:visible;--open:1}",
+       "#board-svg .lab{opacity:clamp(0,calc((var(--open) - .55) * 3),1);transition:opacity .2s}",
+       # card readers send rings outwards; dots run along the wires to the chip
+       "#board-svg .ring{animation:ring 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}",
+       "#board-svg .r2{animation-delay:.3s}#board-svg .r3{animation-delay:.6s}",
+       "@keyframes ring{0%{opacity:0;transform:scale(.6)}30%{opacity:1}100%{opacity:0;transform:scale(1.15)}}",
+       "#board-svg .wire{stroke-dasharray:2 14;opacity:.7;animation:wire 1.2s linear infinite}",
+       "@keyframes wire{to{stroke-dashoffset:16}}",
+       "@media (prefers-reduced-motion:reduce){#board-svg .ring,#board-svg .wire{animation:none}}"]
 for i, k in enumerate(order):
     start = i * 14
-    css.append(f".{k}{{transform:translateY({-lift[k]:.0f}px);animation-name:{k}}}"
-               f"@keyframes {k}{{from{{transform:translateY({-start}px)}}}}")
+    css.append(f"#board-svg .{k}{{transform:translateY(calc(({start} + {lift[k] - start:.0f} * var(--open)) * -1px))}}")
 body = "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
-svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
+svg = (f'<svg id="board-svg" xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
        f'font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">'
        f'<title>NFCBOARD exploded view: top panel, frame, chip and card readers, bottom panel</title>'
        f'<style>{"".join(css)}</style>' + body + "</svg>")
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "board-exploded.svg")
-open(out, "w").write(svg)
-print(out, vb, len(svg))
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+# standalone copy (fully open), and the same drawing placed inside index.html between the markers
+open(os.path.join(root, "assets", "board-exploded.svg"), "w").write(svg)
+page_path = os.path.join(root, "index.html")
+page = open(page_path).read()
+a, b = "<!-- BOARD START -->", "<!-- BOARD END -->"
+if a in page and b in page:
+    page = page[:page.index(a) + len(a)] + svg + page[page.index(b):]
+    open(page_path, "w").write(page)
+print(vb, len(svg))
