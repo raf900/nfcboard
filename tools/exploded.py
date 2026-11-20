@@ -69,7 +69,7 @@ el.append(poly([p(0, 0, 0, L3), p(B, 0, 0, L3), p(B, B, 0, L3), p(0, B, 0, L3)],
 # wires first (under the parts)
 wire = 'stroke="%s" stroke-width="2" fill="none" stroke-dasharray="1 0"' % GREEN
 readers = [(mid, 70), (B - 70, mid), (mid, B - 70), (70, mid)]
-screens_at = [(B - 110, 110), (110, B - 110)]    # ends of the diagonal (800,0)-(0,800)
+screens_at = []    # screens left out of the drawing for now (were at the ends of one diagonal)
 for rx, ry in readers + screens_at:
     a, b = p(mid, mid, 0, L3), p(rx, ry, 0, L3)
     el.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" {wire} opacity="0.55"/>')
@@ -135,7 +135,6 @@ for cx_, cy_ in [(0, 0), (B, 0), (B, B), (0, B)]:
     dy = 1 if cy_ == 0 else -1
     f.append(poly([p(cx_ + dx * wb, cy_ + dy * wb, 0, L2), p(cx_ + dx * 50, cy_ + dy * wb, 0, L2),
                    p(cx_ + dx * wb, cy_ + dy * 50, 0, L2)], FRAME))
-f.append(poly(rect(mid - 80, mid - 35, mid + 80, mid + 35, L2), "none", FRAME, 7))
 el += f
 
 # ---- 1. top panel (green, like the logo), with the card cross faintly marked
@@ -145,7 +144,7 @@ for (x0, y0, x1, y1) in [(mid - 45, 40, mid + 45, 170), (mid - 45, B - 170, mid 
     el.append(poly(rect(x0, y0, x1, y1, L1), "none", CREAM, 1.5, ' stroke-dasharray="5 5" opacity="0.6"'))
 
 # ---- labels on the left, with leader lines to each layer's left corner
-labels = [(L1, "Top panel"), (L2, "Frame"), (L3, "Chip, card readers, screens"), (L4, "Bottom panel")]
+labels = [(L1, "Top panel"), (L2, "Frame"), (L3, "Chip and card readers"), (L4, "Bottom panel")]
 lab = []
 for lift, text in labels:
     ax, ay = p(0, B * 0.75, 0, lift)
