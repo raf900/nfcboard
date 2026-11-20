@@ -12,13 +12,16 @@
   <meta property="og:description" content="A board for the bridge table that records every bid, every card played and the final score.">
   <meta property="og:url" content="https://nfcboard.ch/">
   <meta property="og:image" content="https://nfcboard.ch/assets/share-image.png">
-  <meta name="theme-color" content="#1F6E54">
+  <meta name="theme-color" content="#F6F1E7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --cream: #F6F1E7;
+      --cream-2: #EDE4D2;
       --navy: #12283F;
       --green: #1F6E54;
-      --red: #D9473E;
       --muted: #5A6878;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,59 +29,119 @@
       background: var(--cream);
       color: var(--navy);
       font-family: Inter, "Segoe UI", Helvetica, Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+    }
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 48px 40px 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 88px 16px 32px;
-      position: relative;
-      min-height: 100vh;
+      gap: 48px;
     }
-    .brand {
-      position: absolute; top: 20px; left: 24px;
-      display: flex; align-items: center; gap: 10px;
-      font-size: 22px; letter-spacing: 0.03em; line-height: 1;
+
+    /* text column */
+    .brand { display: flex; align-items: center; gap: 18px; }
+    .brand img { width: 60px; height: 60px; flex: none; }
+    h1 {
+      font-size: clamp(40px, 4.4vw, 62px);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      font-weight: 300;
     }
-    .brand img { width: 36px; height: 36px; }
-    .brand b { font-weight: 800; }
-    .brand span { font-weight: 300; }
-    h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    h1 b { font-weight: 800; }
     .tag {
-      margin-top: 36px;
-      font-size: clamp(17px, 4.2vw, 20px);
+      margin-top: 28px;
+      font-size: clamp(18px, 1.7vw, 22px);
       line-height: 1.5;
-      max-width: 32em;
-      color: var(--navy);
+      max-width: 24em;
+    }
+    .meta {
+      margin-top: 36px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(18, 40, 63, 0.15);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px 24px;
     }
     .soon {
-      display: inline-block;
-      margin-top: 32px;
-      padding: 10px 22px;
+      padding: 10px 20px;
       border-radius: 999px;
       background: var(--green);
       color: var(--cream);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
-    .contact { margin-top: 28px; }
-    .contact img { display: block; margin: 0 auto; }
-    .exploded { width: 100%; max-width: 620px; height: auto; }
-    footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
+    .meta img { display: block; }
+
+    /* drawing column */
+    .board { position: relative; }
+    .board::before {
+      content: "";
+      position: absolute;
+      left: 4%; right: 22%; top: 8%; bottom: 8%;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, var(--cream-2), rgba(237, 228, 210, 0));
+      z-index: 0;
+    }
+    .board img { position: relative; z-index: 1; display: block; width: 100%; height: auto; max-height: 84vh; }
+
+    footer {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 40px 28px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* phones and narrow windows: title, drawing, then the rest */
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 32px 16px 16px;
+        gap: 28px;
+        text-align: center;
+      }
+      .intro { display: contents; }
+      .brand { order: 1; justify-content: center; gap: 12px; }
+      .brand img { width: 48px; height: 48px; }
+      .board { order: 2; }
+      .board img { max-height: none; }
+      .rest { order: 3; }
+      .tag { margin: 0 auto; }
+      .meta { justify-content: center; flex-direction: column; margin-top: 24px; padding-top: 24px; }
+      footer { padding: 16px; text-align: center; }
+    }
   </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="brand"><img src="assets/nfcboard-icon.svg" alt=""><div><b>NFC</b><span>BOARD</span></div></div>
-  <h1>NFCBOARD</h1>
-  <img class="exploded" src="assets/board-exploded.svg" alt="Exploded view of the board in four layers: top panel, frame, chip with card readers, bottom panel">
-  <p class="tag">A board for the bridge table that records every bid, every card played and the final score.</p>
-  <p class="soon">Coming soon</p>
-  <p class="contact"><img src="assets/email.png" alt="Email address" width="142" height="24"></p>
+  <main>
+    <div class="intro">
+      <div class="brand">
+        <img src="assets/nfcboard-icon.svg" alt="">
+        <h1><b>NFC</b>BOARD</h1>
+      </div>
+      <div class="rest">
+        <p class="tag">A board for the bridge table that records every bid, every card played and the final score.</p>
+        <div class="meta">
+          <span class="soon">Coming soon</span>
+          <img src="assets/email.png" alt="Email address" width="142" height="24">
+        </div>
+      </div>
+    </div>
+    <div class="board">
+      <img src="assets/board-exploded.svg" alt="Exploded view of the board in four layers: top panel, frame, chip and card readers, bottom panel">
+    </div>
+  </main>
   <footer>&copy; 2026 NFCBOARD</footer>
 </body>
 </html>

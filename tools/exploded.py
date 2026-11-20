@@ -13,7 +13,7 @@ B = 800.0
 S = 0.52                      # px per mm
 C30, S30 = math.cos(math.radians(30)), math.sin(math.radians(30))
 OX, OY = 470.0, 70.0          # where board corner (0,0) lands on the page
-GAP = 285.0                   # px between layers
+GAP = 250.0                   # px between layers
 
 GREEN, CREAM, NAVY, RED = "#1F6E54", "#F6F1E7", "#12283F", "#D9473E"
 GREEN_D, CREAM_D, FRAME = "#17563F", "#E6DCC8", "#C9B994"
@@ -56,12 +56,15 @@ def bar(x0, y0, x1, y1, w, lift, fill):
                  p(x1 - nx, y1 - ny, 0, lift), p(x0 - nx, y0 - ny, 0, lift)], fill)
 
 
-L1, L2, L3, L4 = 3 * GAP, 2 * GAP, 1 * GAP, 0.0   # top panel, frame, electronics, bottom panel
+L1 = L2 = L3 = L4 = 0.0   # every layer drawn flat at 0; CSS moves them apart
+LIFTS = [3 * GAP, 2 * GAP, GAP, 0.0]   # top panel, frame, electronics, bottom panel
 el = []
+groups = {}
 
 # ---- 4. bottom panel
 el += slab(L4, CREAM_D, "#D3C7AF", "#C7BBA2")
 
+groups['bottom'] = el; el = []
 # ---- 3. electronics
 mid = B / 2
 el.append(poly([p(0, 0, 0, L3), p(B, 0, 0, L3), p(B, B, 0, L3), p(0, B, 0, L3)], "none", NAVY, 1.2,
@@ -75,7 +78,7 @@ for rx, ry in readers + screens_at:
     el.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" {wire} opacity="0.55"/>')
 # readers: cream pad with red waves
 for rx, ry in readers:
-    h = 26
+    h = 34
     el.append(poly(rect(rx - h, ry - h, rx + h, ry + h, L3), CREAM, NAVY, 1.5))
     cx, cy = p(rx, ry, 0, L3)
     for r in (6, 11, 16):
@@ -83,14 +86,14 @@ for rx, ry in readers:
                   f'fill="none" stroke="{RED}" stroke-width="1.6"/>')
     el.append(f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="2.6" ry="1.5" fill="{RED}"/>')
 # chip: navy square with cream legs, like the logo
-ch = 45
+ch = 56
 for i in range(5):
-    t = -ch + 15 + i * 15
+    t = -ch + (i + 1) * 2 * ch / 6
     for (x0, y0, x1, y1) in [(-ch - 10, t - 3, -ch, t + 3), (ch, t - 3, ch + 10, t + 3),
                              (t - 3, -ch - 10, t + 3, -ch), (t - 3, ch, t + 3, ch + 10)]:
         el.append(poly(rect(mid + x0, mid + y0, mid + x1, mid + y1, L3), CREAM, NAVY, 0.8))
 el.append(poly(rect(mid - ch, mid - ch, mid + ch, mid + ch, L3), NAVY))
-el.append(poly(rect(mid - 20, mid - 20, mid + 20, mid + 20, L3), "none", CREAM, 1.6))
+el.append(poly(rect(mid - 24, mid - 24, mid + 24, mid + 24, L3), "none", CREAM, 2))
 # screens: two back to back, standing on the diagonal near each end; plane along (-1, 1)
 SW, SH = 71.0, 53.0
 for sx, sy in screens_at:
@@ -109,6 +112,7 @@ for sx, sy in screens_at:
     el.append(f'<text x="{cx:.1f}" y="{cy + 4:.1f}" text-anchor="middle" font-size="12" fill="{CREAM}" '
               f'font-family="Segoe UI Symbol, DejaVu Sans, sans-serif">&#9824;&#9829;</text>')
 
+groups['elec'] = el; el = []
 # ---- 2. frame (border, seat rails, diagonals, centre box)
 lane0, lane1 = 370.0, 430.0
 wb, wr, wd = 12.5, 10.0, 6.0
@@ -137,39 +141,50 @@ for cx_, cy_ in [(0, 0), (B, 0), (B, B), (0, B)]:
                    p(cx_ + dx * wb, cy_ + dy * 50, 0, L2)], FRAME))
 el += f
 
+groups['frame'] = el; el = []
 # ---- 1. top panel (green, like the logo), with the card cross faintly marked
 el += slab(L1, GREEN, GREEN_D, "#145039")
 for (x0, y0, x1, y1) in [(mid - 45, 40, mid + 45, 170), (mid - 45, B - 170, mid + 45, B - 40),
                          (40, mid - 45, 170, mid + 45), (B - 170, mid - 45, B - 40, mid + 45)]:
     el.append(poly(rect(x0, y0, x1, y1, L1), "none", CREAM, 1.5, ' stroke-dasharray="5 5" opacity="0.6"'))
 
-# ---- labels on the left, with leader lines to each layer's left corner
-labels = [(L1, "Top panel"), (L2, "Frame"), (L3, "Chip and card readers"), (L4, "Bottom panel")]
-lab = []
-for lift, text in labels:
-    ax, ay = p(0, B * 0.75, 0, lift)
-    tx = 70
-    lab.append(f'<line x1="{tx + 4}" y1="{ay:.1f}" x2="{ax - 8:.1f}" y2="{ay:.1f}" stroke="{NAVY}" '
-               f'stroke-width="1" opacity="0.35"/>')
-    lab.append(f'<circle cx="{ax - 8:.1f}" cy="{ay:.1f}" r="3" fill="{NAVY}" opacity="0.6"/>')
-    lab.append(f'<text x="{tx}" y="{ay - 12:.1f}" text-anchor="end" font-size="34" font-weight="600" '
-               f'fill="{NAVY}">{text}</text>')
+groups['top'] = el
 
-xs, ys = [], []
-import re
-for s in el:
-    for m in re.finditer(r"(-?\d+\.\d),(-?\d+\.\d)", s):
-        xs.append(float(m.group(1))); ys.append(float(m.group(2)))
-minx = -400
-maxx = max(xs) + 20
-miny = min(ys) - 20
-maxy = max(ys) + 20
+# ---- labels on the right, joined to each layer's right edge; they travel with their layer
+NAMES = {"top": "Top panel", "frame": "Frame", "elec": "Chip and card readers", "bottom": "Bottom panel"}
+rx, _ = p(B, 0)
+TX = rx + 60
+labels = {}
+for key, name in NAMES.items():
+    ax, ay = p(B, B * 0.22)
+    labels[key] = (f'<g class="lab"><circle cx="{ax:.1f}" cy="{ay:.1f}" r="4" fill="{NAVY}"/>'
+                   f'<line x1="{ax:.1f}" y1="{ay:.1f}" x2="{TX - 12:.1f}" y2="{ay:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.4"/>'
+                   f'<text x="{TX:.1f}" y="{ay + 13:.1f}" font-size="38" font-weight="600" fill="{NAVY}">{name}</text></g>')
+
+lx, _ = p(0, B)
+_, ty = p(0, 0)
+_, by = p(B, B)
+minx, maxx = lx - 10, TX + 440
+miny, maxy = ty - LIFTS[0] - 20, by + 30
 vb = f"{minx:.0f} {miny:.0f} {maxx - minx:.0f} {maxy - miny:.0f}"
 
+# collapsed: layers start stacked close together, then move apart (exploded)
+order = ["bottom", "elec", "frame", "top"]
+lift = {"top": LIFTS[0], "frame": LIFTS[1], "elec": LIFTS[2], "bottom": LIFTS[3]}
+css = ["svg{overflow:visible}",
+       ".layer{animation:1.6s cubic-bezier(.2,.7,.2,1) .4s both}",
+       ".lab{animation:lab .6s ease-out 1.8s both}",
+       "@keyframes lab{from{opacity:0}}",
+       "@media (prefers-reduced-motion:reduce){.layer,.lab{animation:none}}"]
+for i, k in enumerate(order):
+    start = i * 14
+    css.append(f".{k}{{transform:translateY({-lift[k]:.0f}px);animation-name:{k}}}"
+               f"@keyframes {k}{{from{{transform:translateY({-start}px)}}}}")
+body = "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
 svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
        f'font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">'
-       f'<title>NFCBOARD exploded view: top panel, frame, electronics, bottom panel</title>'
-       + "".join(el) + "".join(lab) + "</svg>")
+       f'<title>NFCBOARD exploded view: top panel, frame, chip and card readers, bottom panel</title>'
+       f'<style>{"".join(css)}</style>' + body + "</svg>")
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "board-exploded.svg")
 open(out, "w").write(svg)
 print(out, vb, len(svg))
