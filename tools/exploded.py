@@ -57,7 +57,7 @@ def bar(x0, y0, x1, y1, w, lift, fill):
 
 
 L1 = L2 = L3 = L4 = 0.0   # every layer drawn flat at 0; CSS moves them apart
-LIFTS = [3 * GAP, 2 * GAP, GAP, 0.0]   # top panel, frame, electronics, bottom panel
+LIFTS = [3 * GAP, 2 * GAP, GAP, 0.45 * GAP]   # top panel, frame, electronics, bottom panel
 el = []
 groups = {}
 
@@ -175,7 +175,7 @@ for key, lines in NAMES.items():
 _, ty = p(0, 0)
 _, by = p(B, B)
 minx, maxx = lx - LABEL_SPACE, rx + LABEL_SPACE
-miny, maxy = ty - LIFTS[0] - 20, by + 30
+miny, maxy = ty - LIFTS[0] - 20, by - LIFTS[3] + 30
 vb = f"{minx:.0f} {miny:.0f} {maxx - minx:.0f} {maxy - miny:.0f}"
 
 # collapsed: layers start stacked close together, then move apart (exploded)
