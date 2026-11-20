@@ -151,21 +151,30 @@ for (x0, y0, x1, y1) in [(mid - 45, 40, mid + 45, 170), (mid - 45, B - 170, mid 
 
 groups['top'] = el
 
-# ---- labels on the right, joined to each layer's right edge; they travel with their layer
-NAMES = {"top": "Top panel", "frame": "Frame", "elec": "Chip and card readers", "bottom": "Bottom panel"}
+# ---- labels, alternating right / left so the board itself sits in the middle of the drawing;
+# they travel with their layer. Long names are split over two lines.
+NAMES = {"top": ("Top panel",), "frame": ("Frame",), "elec": ("Chip and", "card readers"), "bottom": ("Bottom panel",)}
+SIDE = {"top": "r", "frame": "l", "elec": "r", "bottom": "l"}
+LABEL_SPACE = 270            # room for labels on each side of the board (drawing units)
 rx, _ = p(B, 0)
-TX = rx + 60
-labels = {}
-for key, name in NAMES.items():
-    ax, ay = p(B, B * 0.22)
-    labels[key] = (f'<g class="lab"><circle cx="{ax:.1f}" cy="{ay:.1f}" r="4" fill="{NAVY}"/>'
-                   f'<line x1="{ax:.1f}" y1="{ay:.1f}" x2="{TX - 12:.1f}" y2="{ay:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.4"/>'
-                   f'<text x="{TX:.1f}" y="{ay + 13:.1f}" font-size="38" font-weight="600" fill="{NAVY}">{name}</text></g>')
-
 lx, _ = p(0, B)
+labels = {}
+for key, lines in NAMES.items():
+    if SIDE[key] == "r":
+        ax, ay = p(B, B * 0.22)
+        tx, anchor, lx2 = rx + 40, "start", rx + 30
+    else:
+        ax, ay = p(B * 0.22, B)
+        tx, anchor, lx2 = lx - 40, "end", lx - 30
+    n = len(lines)
+    tsp = "".join(f'<tspan x="{tx:.1f}" dy="{0 if i == 0 else 1.15:.2f}em">{t}</tspan>' for i, t in enumerate(lines))
+    labels[key] = (f'<g class="lab"><circle cx="{ax:.1f}" cy="{ay:.1f}" r="4" fill="{NAVY}"/>'
+                   f'<line x1="{ax:.1f}" y1="{ay:.1f}" x2="{lx2:.1f}" y2="{ay:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.4"/>'
+                   f'<text y="{ay:.1f}" dy="{0.35 - (n - 1) * 0.575:.2f}em" text-anchor="{anchor}" font-size="24" font-weight="600" fill="{NAVY}">{tsp}</text></g>')
+
 _, ty = p(0, 0)
 _, by = p(B, B)
-minx, maxx = lx - 10, TX + 440
+minx, maxx = lx - LABEL_SPACE, rx + LABEL_SPACE
 miny, maxy = ty - LIFTS[0] - 20, by + 30
 vb = f"{minx:.0f} {miny:.0f} {maxx - minx:.0f} {maxy - miny:.0f}"
 
@@ -183,9 +192,10 @@ css = ["#board-svg{overflow:visible;--open:1}",
        "#board-svg .wire{stroke-dasharray:2 14;opacity:.7;animation:wire 1.2s linear infinite}",
        "@keyframes wire{to{stroke-dashoffset:16}}",
        "@media (prefers-reduced-motion:reduce){#board-svg .ring,#board-svg .wire{animation:none}}"]
+MIDDLE = 1.5 * GAP   # closed: all layers meet halfway, so the top comes down and the bottom comes up
 for i, k in enumerate(order):
-    start = i * 14
-    css.append(f"#board-svg .{k}{{transform:translateY(calc(({start} + {lift[k] - start:.0f} * var(--open)) * -1px))}}")
+    start = MIDDLE + (i - 1.5) * 14
+    css.append(f"#board-svg .{k}{{transform:translateY(calc(({start:.0f} + {lift[k] - start:.0f} * var(--open)) * -1px))}}")
 body = "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
 svg = (f'<svg id="board-svg" xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
        f'font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">'
