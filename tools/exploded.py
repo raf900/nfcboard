@@ -114,32 +114,33 @@ for sx, sy in screens_at:
               f'font-family="Segoe UI Symbol, DejaVu Sans, sans-serif">&#9824;&#9829;</text>')
 
 groups['elec'] = el; el = []
-# ---- 2. frame (border, seat rails, diagonals, centre box)
-lane0, lane1 = 370.0, 430.0
-wb, wr, wd = 12.5, 10.0, 6.0
+# ---- 2. frame: a solid border all round, and a honeycomb filling the whole inside
+wb = 16.0          # border width (mm)
+HEX = 68.0         # honeycomb cell size (centre to corner, mm)
+HW = 5.5           # honeycomb wall thickness (mm)
 f = []
-for a0, a1 in [(0, lane0), (lane1, B)]:
-    f.append(bar(a0, wb / 2, a1, wb / 2, wb, L2, FRAME))           # y = 0 side
-    f.append(bar(a0, B - wb / 2, a1, B - wb / 2, wb, L2, FRAME))   # y = B side
-    f.append(bar(wb / 2, a0, wb / 2, a1, wb, L2, FRAME))           # x = 0 side
-    f.append(bar(B - wb / 2, a0, B - wb / 2, a1, wb, L2, FRAME))   # x = B side
-rail_end = 320.0
-for xr in (lane0 - wr / 2, lane1 + wr / 2):
-    f.append(bar(xr, 0, xr, rail_end, wr, L2, FRAME))
-    f.append(bar(xr, B, xr, B - rail_end, wr, L2, FRAME))
-    f.append(bar(0, xr, rail_end, xr, wr, L2, FRAME))
-    f.append(bar(B, xr, B - rail_end, xr, wr, L2, FRAME))
-for cx_, cy_ in [(0, 0), (B, 0), (B, B), (0, B)]:
-    ex = mid + (25 if cx_ > mid else -25)
-    ey = mid + (25 if cy_ > mid else -25)
-    sx_ = 20 if cx_ == 0 else B - 20
-    sy_ = 20 if cy_ == 0 else B - 20
-    f.append(bar(sx_, sy_, ex, ey, wd, L2, FRAME))
-    # corner triangles
-    dx = 1 if cx_ == 0 else -1
-    dy = 1 if cy_ == 0 else -1
-    f.append(poly([p(cx_ + dx * wb, cy_ + dy * wb, 0, L2), p(cx_ + dx * 50, cy_ + dy * wb, 0, L2),
-                   p(cx_ + dx * wb, cy_ + dy * 50, 0, L2)], FRAME))
+inner = [p(wb, wb, 0, L2), p(B - wb, wb, 0, L2), p(B - wb, B - wb, 0, L2), p(wb, B - wb, 0, L2)]
+f.append('<clipPath id="hc"><polygon points="' + " ".join(f"{x:.1f},{y:.1f}" for x, y in inner) + '"/></clipPath>')
+cells = []
+dx, dy = 1.5 * HEX, math.sqrt(3) * HEX
+col = 0
+x = -HEX
+while x < B + 2 * HEX:
+    y = (-dy / 2 if col % 2 else 0.0) - dy
+    while y < B + 2 * dy:
+        pts = [p(x + HEX * math.cos(math.radians(60 * i)), y + HEX * math.sin(math.radians(60 * i)), 0, L2) for i in range(6)]
+        cells.append("M" + " L".join(f"{px:.1f},{py:.1f}" for px, py in pts) + " Z")
+        y += dy
+    x += dx
+    col += 1
+hw_px = HW * S * 1.0
+f.append(f'<path d="{" ".join(cells)}" fill="none" stroke="{FRAME}" stroke-width="{hw_px:.1f}" '
+         f'stroke-linejoin="round" clip-path="url(#hc)"/>')
+# border: outer square minus inner square
+outer = [p(0, 0, 0, L2), p(B, 0, 0, L2), p(B, B, 0, L2), p(0, B, 0, L2)]
+ring = ("M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in outer) + " Z M"
+        + " L".join(f"{x:.1f},{y:.1f}" for x, y in reversed(inner)) + " Z")
+f.append(f'<path d="{ring}" fill="{FRAME}" fill-rule="evenodd"/>')
 el += f
 
 groups['frame'] = el; el = []
