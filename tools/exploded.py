@@ -13,7 +13,7 @@ B = 800.0
 S = 0.52                      # px per mm
 C30, S30 = math.cos(math.radians(30)), math.sin(math.radians(30))
 OX, OY = 470.0, 70.0          # where board corner (0,0) lands on the page
-GAP = 250.0                   # px between layers
+GAP = 175.0                   # px between layers
 
 GREEN, CREAM, NAVY, RED = "#1F6E54", "#F6F1E7", "#12283F", "#D9473E"
 GREEN_D, CREAM_D, FRAME = "#17563F", "#E6DCC8", "#C9B994"
@@ -57,7 +57,7 @@ def bar(x0, y0, x1, y1, w, lift, fill):
 
 
 L1 = L2 = L3 = L4 = 0.0   # every layer drawn flat at 0; CSS moves them apart
-LIFTS = [3 * GAP, 2 * GAP, GAP, 0.45 * GAP]   # top panel, frame, electronics, bottom panel
+LIFTS = [525.0, 345.0, 110.0, 0.0]   # top panel, frame, circuit, bottom panel (frame stays clear of the chip)   # top panel, frame, electronics, bottom panel
 el = []
 groups = {}
 
