@@ -57,7 +57,7 @@ def bar(x0, y0, x1, y1, w, lift, fill):
 
 
 L1 = L2 = L3 = L4 = 0.0   # every layer drawn flat at 0; CSS moves them apart
-LIFTS = [525.0, 345.0, 110.0, 0.0]   # top panel, frame, circuit, bottom panel (frame stays clear of the chip)   # top panel, frame, electronics, bottom panel
+LIFTS = [525.0, 345.0, 75.0, 0.0]   # top panel, frame, circuit, bottom panel (frame stays clear of the chip)
 el = []
 groups = {}
 
