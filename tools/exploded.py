@@ -74,14 +74,10 @@ screens_at = []    # screens left out of the drawing for now (were at the ends o
 for rx, ry in readers + screens_at:
     a, b = p(mid, mid, 0, L3), p(rx, ry, 0, L3)
     el.append(f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" {wire}/>')
-# readers: navy pad like the chip, with a cream antenna loop; green rings pulse outwards
+# readers: navy pad like the chip, with a cream antenna loop
 for rx, ry in readers:
     h = 30
     cx, cy = p(rx, ry, 0, L3)
-    for i_r, r in enumerate((38, 54, 70)):
-        el.append(f'<ellipse class="ring r{i_r + 1}" cx="{cx:.1f}" cy="{cy:.1f}" '
-                  f'rx="{r * C30 * S * 1.414:.1f}" ry="{r * S30 * S * 1.414:.1f}" '
-                  f'fill="none" stroke="{GREEN}" stroke-width="1.8"/>')
     el.append(poly(rect(rx - h, ry - h, rx + h, ry + h, L3), NAVY))
     for k in (20, 12):
         el.append(poly(rect(rx - k, ry - k, rx + k, ry + k, L3), "none", CREAM, 1.4))
