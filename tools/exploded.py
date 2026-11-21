@@ -138,6 +138,10 @@ f.append(f'<path d="{" ".join(cells)}" fill="none" stroke="{FRAME}" stroke-width
 outer = [p(0, 0, 0, L2), p(B, 0, 0, L2), p(B, B, 0, L2), p(0, B, 0, L2)]
 ring = ("M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in outer) + " Z M"
         + " L".join(f"{x:.1f},{y:.1f}" for x, y in reversed(inner)) + " Z")
+t = 8.0
+bq, cq, dq = outer[1], outer[2], outer[3]
+f.insert(0, poly([bq, cq, (cq[0], cq[1] + t), (bq[0], bq[1] + t)], "#B5A47C"))
+f.insert(0, poly([cq, dq, (dq[0], dq[1] + t), (cq[0], cq[1] + t)], "#BFAF88"))
 f.append(f'<path d="{ring}" fill="{FRAME}" fill-rule="evenodd"/>')
 el += f
 
@@ -195,13 +199,15 @@ css = ["#board-svg{overflow:visible;--open:1}",
        "@keyframes wire{to{stroke-dashoffset:16}}",
        "@media (prefers-reduced-motion:reduce){#board-svg .ring,#board-svg .wire{animation:none}}"]
 MIDDLE = 1.5 * GAP   # closed: all layers meet halfway, so the top comes down and the bottom comes up
+# closed: each layer sits right on the one below (panels and frame are drawn 8 units thick)
+CLOSED = {"bottom": MIDDLE - 8, "elec": MIDDLE - 8, "frame": MIDDLE, "top": MIDDLE + 8}
 for i, k in enumerate(order):
-    start = MIDDLE + (i - 1.5) * 14
+    start = CLOSED[k]
     css.append(f"#board-svg .{k}{{transform:translateY(calc(({start:.0f} + {lift[k] - start:.0f} * var(--open)) * -1px))}}")
 # "15 mm thickness": a measure beside the closed stack, shown only while the board is closed
 cx_r, cy_r = p(B, 0)
-y_top = cy_r - (MIDDLE + 1.5 * 14)
-y_bot = cy_r - (MIDDLE - 1.5 * 14) + 8
+y_top = cy_r - CLOSED["top"]
+y_bot = cy_r - CLOSED["bottom"] + 8
 mx = cx_r + 22
 thick = (f'<g class="thick"><line x1="{mx:.1f}" y1="{y_top:.1f}" x2="{mx:.1f}" y2="{y_bot:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.5"/>'
          f'<line x1="{mx - 7:.1f}" y1="{y_top:.1f}" x2="{mx + 7:.1f}" y2="{y_top:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.5"/>'
