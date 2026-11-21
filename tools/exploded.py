@@ -67,8 +67,6 @@ el += slab(L4, CREAM_D, "#D3C7AF", "#C7BBA2")
 groups['bottom'] = el; el = []
 # ---- 3. electronics
 mid = B / 2
-el.append(poly([p(0, 0, 0, L3), p(B, 0, 0, L3), p(B, B, 0, L3), p(0, B, 0, L3)], "none", NAVY, 1.2,
-              ' stroke-dasharray="6 6" opacity="0.3"'))
 # wires first (under the parts)
 wire = 'stroke="%s" stroke-width="3" fill="none" stroke-linecap="round" class="wire"' % GREEN
 readers = [(mid, 70), (B - 70, mid), (mid, B - 70), (70, mid)]
@@ -154,14 +152,17 @@ groups['top'] = el
 
 # ---- labels, alternating right / left so the board itself sits in the middle of the drawing;
 # they travel with their layer. Long names are split over two lines.
-NAMES = {"top": ("Top panel",), "frame": ("Frame",), "elec": ("Chip and", "card readers"), "bottom": ("Bottom panel",)}
+NAMES = {"top": ("Top panel",), "frame": ("Frame",), "elec": ("Circuit",), "bottom": ("Bottom panel",)}
 SIDE = {"top": "r", "frame": "l", "elec": "r", "bottom": "l"}
 LABEL_SPACE = 270            # room for labels on each side of the board (drawing units)
 rx, _ = p(B, 0)
 lx, _ = p(0, B)
 labels = {}
 for key, lines in NAMES.items():
-    if SIDE[key] == "r":
+    if key == "elec":                  # no outline on this layer: point at the right-hand card reader
+        ax, ay = p(B - 70 + 34, mid)
+        tx, anchor, lx2 = rx + 40, "start", rx + 30
+    elif SIDE[key] == "r":
         ax, ay = p(B, B * 0.22)
         tx, anchor, lx2 = rx + 40, "start", rx + 30
     else:
@@ -210,7 +211,7 @@ css.append("#board-svg .thick{opacity:clamp(0,calc((.3 - var(--open)) * 5),1);tr
 body = thick + "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
 svg = (f'<svg id="board-svg" xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
        f'font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">'
-       f'<title>NFCBOARD exploded view: top panel, frame, chip and card readers, bottom panel</title>'
+       f'<title>NFCBOARD exploded view: top panel, frame, circuit, bottom panel</title>'
        f'<style>{"".join(css)}</style>' + body + "</svg>")
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 # standalone copy (fully open), and the same drawing placed inside index.html between the markers
