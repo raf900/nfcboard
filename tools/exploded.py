@@ -197,7 +197,17 @@ MIDDLE = 1.5 * GAP   # closed: all layers meet halfway, so the top comes down an
 for i, k in enumerate(order):
     start = MIDDLE + (i - 1.5) * 14
     css.append(f"#board-svg .{k}{{transform:translateY(calc(({start:.0f} + {lift[k] - start:.0f} * var(--open)) * -1px))}}")
-body = "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
+# "15 mm thickness": a measure beside the closed stack, shown only while the board is closed
+cx_r, cy_r = p(B, 0)
+y_top = cy_r - (MIDDLE + 1.5 * 14)
+y_bot = cy_r - (MIDDLE - 1.5 * 14) + 8
+mx = cx_r + 22
+thick = (f'<g class="thick"><line x1="{mx:.1f}" y1="{y_top:.1f}" x2="{mx:.1f}" y2="{y_bot:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.5"/>'
+         f'<line x1="{mx - 7:.1f}" y1="{y_top:.1f}" x2="{mx + 7:.1f}" y2="{y_top:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.5"/>'
+         f'<line x1="{mx - 7:.1f}" y1="{y_bot:.1f}" x2="{mx + 7:.1f}" y2="{y_bot:.1f}" stroke="{NAVY}" stroke-width="1.5" opacity="0.5"/>'
+         f'<text x="{mx + 18:.1f}" y="{(y_top + y_bot) / 2:.1f}" dy="0.35em" font-size="24" font-weight="600" fill="{NAVY}">15 mm thickness</text></g>')
+css.append("#board-svg .thick{opacity:clamp(0,calc((.3 - var(--open)) * 5),1);transition:opacity .2s}")
+body = thick + "".join(f'<g class="layer {k}">' + "".join(groups[k]) + labels[k] + "</g>" for k in order)
 svg = (f'<svg id="board-svg" xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" '
        f'font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">'
        f'<title>NFCBOARD exploded view: top panel, frame, chip and card readers, bottom panel</title>'
