@@ -38,7 +38,7 @@
       width: 100%;
       max-width: 1240px;
       margin: 0 auto;
-      padding: 48px 40px 24px;
+      padding: 24px 40px 24px;
       display: grid;
       grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
       align-items: center;
@@ -117,13 +117,43 @@
       padding: 0 40px 28px;
       font-size: 13px;
       color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 24px;
     }
+    .swiss { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--navy); }
+    .swiss svg { width: 14px; height: 14px; flex: none; border-radius: 2px; }
+
+    /* top bar: Portal button */
+    .top {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px 40px 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .portal {
+      padding: 9px 22px;
+      border-radius: 999px;
+      border: 1.5px solid var(--navy);
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .portal:hover, .portal:focus-visible { background: var(--navy); color: var(--cream); }
+    .portal:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 
     /* phones and narrow windows: title, drawing, then the rest */
     @media (max-width: 860px) {
+      .top { padding: 16px 16px 0; }
       main {
         grid-template-columns: 1fr;
-        padding: 32px 16px 16px;
+        padding: 16px 16px 16px;
         gap: 28px;
         text-align: center;
       }
@@ -138,11 +168,12 @@
       .tag, .sub, .close { margin-left: auto; margin-right: auto; }
       .feats { justify-content: center; }
       .meta { justify-content: center; flex-direction: column; margin-top: 24px; padding-top: 24px; }
-      footer { padding: 16px; text-align: center; }
+      footer { padding: 16px; justify-content: center; text-align: center; flex-direction: column; align-items: center; }
     }
   </style>
 </head>
 <body>
+  <header class="top"><a class="portal" href="https://my.nfcboard.ch/">Portal</a></header>
   <main>
     <div class="intro">
       <div class="brand">
@@ -165,7 +196,10 @@
       </div>
     </div>
   </main>
-  <footer>&copy; 2026 NFCBOARD</footer>
+  <footer>
+    <span>&copy; 2026 NFCBOARD</span>
+    <span class="swiss"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#DA291C"/><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg>Made in Switzerland</span>
+  </footer>
   <script>
     (function () {
       var svg = document.getElementById('board-svg');
