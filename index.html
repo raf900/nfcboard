@@ -118,9 +118,9 @@
       font-size: 13px;
       color: var(--muted);
       display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px 24px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
     }
     .swiss { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--navy); }
     .swiss svg { width: 14px; height: 14px; flex: none; border-radius: 2px; }
@@ -197,8 +197,8 @@
     </div>
   </main>
   <footer>
-    <span>&copy; 2026 NFCBOARD</span>
     <span class="swiss"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#DA291C"/><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg>Made in Switzerland</span>
+    <span>&copy; 2026 NFCBOARD</span>
   </footer>
   <script>
     (function () {
