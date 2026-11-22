@@ -133,7 +133,25 @@
       padding: 24px 40px 0;
       display: flex;
       justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
     }
+    .lang { position: relative; display: inline-flex; align-items: center; }
+    .lang-globe { position: absolute; left: 12px; width: 16px; height: 16px; pointer-events: none; display: flex; }
+    .lang-globe svg { width: 16px; height: 16px; fill: none; stroke: var(--navy); stroke-width: 1.6; }
+    .lang select {
+      appearance: none; -webkit-appearance: none;
+      padding: 9px 30px 9px 34px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(18, 40, 63, 0.25);
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2312283F' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center / 10px 6px;
+      color: var(--navy);
+      font: 600 14px/1.2 Inter, "Segoe UI", Helvetica, Arial, sans-serif;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+    }
+    .lang select:hover { border-color: var(--navy); }
+    .lang select:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
     .portal {
       padding: 9px 22px;
       border-radius: 999px;
@@ -173,7 +191,14 @@
   </style>
 </head>
 <body>
-  <header class="top"><a class="portal" href="https://my.nfcboard.ch/">Portal</a></header>
+  <header class="top">
+    <label class="lang"><span class="lang-globe" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg></span>
+      <select id="lang" aria-label="Language">
+        <option value="en">EN</option><option value="de">DE</option><option value="fr">FR</option><option value="it">IT</option>
+      </select>
+    </label>
+    <a class="portal" href="https://my.nfcboard.ch/" data-i18n="portal">Portal</a>
+  </header>
   <main>
     <div class="intro">
       <div class="brand">
@@ -181,10 +206,10 @@
         <h1><b>NFC</b>BOARD</h1>
       </div>
       <div class="rest">
-        <p class="tag">A wooden board with built-in electronics, made for the bridge table, that records every bid and every card played.</p>
-        <p class="close"><span>The convenience of a <b>digital system</b>,</span><span>the good feeling of <b>real cards</b> in your hands.</span></p>
+        <p class="tag" data-i18n="tag">A wooden board with built-in electronics, made for the bridge table, that records every bid and every card played.</p>
+        <p class="close" data-i18n="close"><span>The convenience of a <b>digital system</b>,</span><span>the good feeling of <b>real cards</b> in your hands.</span></p>
         <div class="meta">
-          <span class="soon">Coming soon</span>
+          <span class="soon" data-i18n="soon">Coming soon</span>
           <img src="assets/email.png" alt="Email address" width="142" height="24">
         </div>
       </div>
@@ -197,10 +222,64 @@
     </div>
   </main>
   <footer>
-    <span class="swiss"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#DA291C"/><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg>Made in Switzerland</span>
+    <span class="swiss"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#DA291C"/><path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/></svg><span data-i18n="swiss">Made in Switzerland</span></span>
     <span>&copy; 2026 NFCBOARD</span>
   </footer>
   <script>
+    /* Languages: English, German, French, Italian. The choice is remembered in this browser. */
+    (function () {
+      var T = {
+        en: { title: 'NFCBOARD · Coming soon', portal: 'Portal',
+          tag: 'A wooden board with built-in electronics, made for the bridge table, that records every bid and every card played.',
+          close: '<span>The convenience of a <b>digital system</b>,</span><span>the good feeling of <b>real cards</b> in your hands.</span>',
+          soon: 'Coming soon', swiss: 'Made in Switzerland', slider: 'Open or close the board',
+          labels: ['Top panel', 'Frame', 'Circuit', 'Bottom panel', '15 mm thickness'] },
+        de: { title: 'NFCBOARD · Demnächst', portal: 'Portal',
+          tag: 'Ein Holzbrett mit eingebauter Elektronik, gemacht für den Bridgetisch, das jedes Gebot und jede gespielte Karte aufzeichnet.',
+          close: '<span>Der Komfort eines <b>digitalen Systems</b>,</span><span>das gute Gefühl <b>echter Karten</b> in der Hand.</span>',
+          soon: 'Demnächst', swiss: 'Hergestellt in der Schweiz', slider: 'Brett öffnen oder schliessen',
+          labels: ['Deckplatte', 'Rahmen', 'Elektronik', 'Bodenplatte', '15 mm Dicke'] },
+        fr: { title: 'NFCBOARD · Bientôt disponible', portal: 'Portail',
+          tag: 'Une planche en bois avec électronique intégrée, conçue pour la table de bridge, qui enregistre chaque enchère et chaque carte jouée.',
+          close: '<span>Le confort d’un <b>système numérique</b>,</span><span>le plaisir de <b>vraies cartes</b> en main.</span>',
+          soon: 'Bientôt disponible', swiss: 'Fabriqué en Suisse', slider: 'Ouvrir ou fermer la planche',
+          labels: ['Plateau', 'Cadre', 'Électronique', 'Fond', '15 mm d’épaisseur'] },
+        it: { title: 'NFCBOARD · Prossimamente', portal: 'Portale',
+          tag: 'Una tavola in legno con elettronica integrata, pensata per il tavolo da bridge, che registra ogni dichiarazione e ogni carta giocata.',
+          close: '<span>La comodità di un <b>sistema digitale</b>,</span><span>il piacere di <b>carte vere</b> in mano.</span>',
+          soon: 'Prossimamente', swiss: 'Prodotto in Svizzera', slider: 'Apri o chiudi la tavola',
+          labels: ['Piano', 'Telaio', 'Elettronica', 'Fondo', '15 mm di spessore'] }
+      };
+      // the drawing's own labels, found by their English text
+      var svgText = {};
+      T.en.labels.forEach(function (en, i) {
+        Array.prototype.forEach.call(document.querySelectorAll('#board-svg text, #board-svg tspan'), function (el) {
+          if (!el.children.length && el.textContent.trim() === en) svgText[i] = el;
+        });
+      });
+      var select = document.getElementById('lang');
+      function apply(lang) {
+        var t = T[lang] || T.en;
+        document.documentElement.lang = lang;
+        document.title = t.title;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
+          var k = el.getAttribute('data-i18n');
+          if (k === 'close') el.innerHTML = t.close; else el.textContent = t[k];
+        });
+        Object.keys(svgText).forEach(function (i) { svgText[i].textContent = t.labels[i]; });
+        document.getElementById('open').setAttribute('aria-label', t.slider);
+        select.value = lang;
+      }
+      var saved = null;
+      try { saved = localStorage.getItem('nfcboard.lang'); } catch (e) { /* private mode */ }
+      var guess = (navigator.language || 'en').slice(0, 2).toLowerCase();
+      apply(T[saved] ? saved : T[guess] ? guess : 'en');
+      select.addEventListener('change', function () {
+        try { localStorage.setItem('nfcboard.lang', select.value); } catch (e) { /* ignore */ }
+        apply(select.value);
+      });
+    })();
+
     (function () {
       var svg = document.getElementById('board-svg');
       var input = document.getElementById('open');
