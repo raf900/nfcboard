@@ -109,40 +109,37 @@ for sx, sy in screens_at:
               f'font-family="Segoe UI Symbol, DejaVu Sans, sans-serif">&#9824;&#9829;</text>')
 
 groups['elec'] = el; el = []
-# ---- 2. frame: border with a gap at each seat lane, two rails along each lane, diagonals, corner triangles
-lane0, lane1 = 370.0, 430.0
-wb, wr, wd = 12.5, 10.0, 6.0
-t = 8.0                    # drawn thickness of the visible outer edges
+# ---- 2. frame: a solid border all round, and a honeycomb filling the whole inside
+wb = 16.0          # border width (mm)
+HEX = 68.0         # honeycomb cell size (centre to corner, mm)
+HW = 5.5           # honeycomb wall thickness (mm)
 f = []
-segs = [(0, lane0), (lane1, B)]
-# visible outer edges (x = B side and y = B side), only where the border is
-for a0, a1 in segs:
-    b0, b1 = p(B, a0, 0, L2), p(B, a1, 0, L2)
-    f.append(poly([b0, b1, (b1[0], b1[1] + t), (b0[0], b0[1] + t)], "#B5A47C"))
-    c0, c1 = p(a0, B, 0, L2), p(a1, B, 0, L2)
-    f.append(poly([c0, c1, (c1[0], c1[1] + t), (c0[0], c0[1] + t)], "#BFAF88"))
-for a0, a1 in segs:
-    f.append(bar(a0, wb / 2, a1, wb / 2, wb, L2, FRAME))           # y = 0 side
-    f.append(bar(a0, B - wb / 2, a1, B - wb / 2, wb, L2, FRAME))   # y = B side
-    f.append(bar(wb / 2, a0, wb / 2, a1, wb, L2, FRAME))           # x = 0 side
-    f.append(bar(B - wb / 2, a0, B - wb / 2, a1, wb, L2, FRAME))   # x = B side
-rail_end = 320.0
-for xr in (lane0 - wr / 2, lane1 + wr / 2):
-    f.append(bar(xr, 0, xr, rail_end, wr, L2, FRAME))
-    f.append(bar(xr, B, xr, B - rail_end, wr, L2, FRAME))
-    f.append(bar(0, xr, rail_end, xr, wr, L2, FRAME))
-    f.append(bar(B, xr, B - rail_end, xr, wr, L2, FRAME))
-mid = B / 2
-for cx_, cy_ in [(0, 0), (B, 0), (B, B), (0, B)]:
-    ex = mid + (25 if cx_ > mid else -25)
-    ey = mid + (25 if cy_ > mid else -25)
-    sx_ = 20 if cx_ == 0 else B - 20
-    sy_ = 20 if cy_ == 0 else B - 20
-    f.append(bar(sx_, sy_, ex, ey, wd, L2, FRAME))
-    dx = 1 if cx_ == 0 else -1
-    dy = 1 if cy_ == 0 else -1
-    f.append(poly([p(cx_ + dx * wb, cy_ + dy * wb, 0, L2), p(cx_ + dx * 50, cy_ + dy * wb, 0, L2),
-                   p(cx_ + dx * wb, cy_ + dy * 50, 0, L2)], FRAME))
+inner = [p(wb, wb, 0, L2), p(B - wb, wb, 0, L2), p(B - wb, B - wb, 0, L2), p(wb, B - wb, 0, L2)]
+f.append('<clipPath id="hc"><polygon points="' + " ".join(f"{x:.1f},{y:.1f}" for x, y in inner) + '"/></clipPath>')
+cells = []
+dx, dy = 1.5 * HEX, math.sqrt(3) * HEX
+col = 0
+x = -HEX
+while x < B + 2 * HEX:
+    y = (-dy / 2 if col % 2 else 0.0) - dy
+    while y < B + 2 * dy:
+        pts = [p(x + HEX * math.cos(math.radians(60 * i)), y + HEX * math.sin(math.radians(60 * i)), 0, L2) for i in range(6)]
+        cells.append("M" + " L".join(f"{px:.1f},{py:.1f}" for px, py in pts) + " Z")
+        y += dy
+    x += dx
+    col += 1
+hw_px = HW * S * 1.0
+f.append(f'<path d="{" ".join(cells)}" fill="none" stroke="{FRAME}" stroke-width="{hw_px:.1f}" '
+         f'stroke-linejoin="round" clip-path="url(#hc)"/>')
+# border: outer square minus inner square
+outer = [p(0, 0, 0, L2), p(B, 0, 0, L2), p(B, B, 0, L2), p(0, B, 0, L2)]
+ring = ("M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in outer) + " Z M"
+        + " L".join(f"{x:.1f},{y:.1f}" for x, y in reversed(inner)) + " Z")
+t = 8.0
+bq, cq, dq = outer[1], outer[2], outer[3]
+f.insert(0, poly([bq, cq, (cq[0], cq[1] + t), (bq[0], bq[1] + t)], "#B5A47C"))
+f.insert(0, poly([cq, dq, (dq[0], dq[1] + t), (cq[0], cq[1] + t)], "#BFAF88"))
+f.append(f'<path d="{ring}" fill="{FRAME}" fill-rule="evenodd"/>')
 el += f
 
 groups['frame'] = el; el = []
